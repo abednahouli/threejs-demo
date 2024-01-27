@@ -73,8 +73,6 @@ loop();
 // GSAP
 const tl = gsap.timeline({ defaults: { ease: "power1.out" } });
 tl.fromTo(mesh.scale, { x: 0, y: 0, z: 0 }, { duration: 1, x: 1, y: 1, z: 1 });
-tl.fromTo("nav", { y: "-100%" }, { duration: 1, y: "0%" });
-tl.fromTo(".title", { opacity: 0 }, { duration: 1, opacity: 1 }, "-=1");
 
 // Mouse Animation Color
 let mouseDown = false;
@@ -89,6 +87,38 @@ window.addEventListener("mousemove", (e) => {
       Math.round((e.pageY / sizes.height) * 255),
       150,
     ];
+    let newColor = new THREE.Color(`rgb(${rgb.join(",")})`);
+    gsap.to(mesh.material.color, {
+      duration: 0.5,
+      r: newColor.r,
+      g: newColor.g,
+      b: newColor.b,
+    });
+  }
+});
+
+// Touch events
+let touchDown = false;
+
+canvas.addEventListener("touchstart", () => {
+  touchDown = true;
+});
+
+canvas.addEventListener("touchend", () => {
+  touchDown = false;
+});
+
+canvas.addEventListener("touchmove", (e) => {
+  if (touchDown) {
+    const touch = e.touches[0];
+    const x = touch.clientX;
+    const y = touch.clientY;
+    const rect = canvas.getBoundingClientRect();
+    const normalizedX = (x - rect.left) / canvas.clientWidth;
+    const normalizedY = (y - rect.top) / canvas.clientHeight;
+
+    rgb = [Math.round(normalizedX * 255), Math.round(normalizedY * 255), 150];
+
     let newColor = new THREE.Color(`rgb(${rgb.join(",")})`);
     gsap.to(mesh.material.color, {
       duration: 0.5,
